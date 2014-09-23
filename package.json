@@ -4,5 +4,7 @@
   "main": "src/index.js",
   "private": "false",
   "dependencies": {
+    "orion-server": "git://github.com/alarner/orion-server",
+    "sails-disk": "^0.10.4"
   }
 }
