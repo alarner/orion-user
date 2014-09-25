@@ -1,0 +1,26 @@
+{
+  "name": "orion-user",
+  "main": "index.js",
+  "version": "0.0.1",
+  "homepage": "https://github.com/alarner/orion-user",
+  "authors": [
+    "Aaron Larner <anlarner@gmail.com>"
+  ],
+  "description": "User authentication and management for orion-server",
+  "keywords": [
+    "user",
+    "auth"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/lib",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.2.0"
+  }
+}
