@@ -9,5 +9,9 @@ module.exports = {
 
 	register: function(req, res, models, config) {
 		res.view();
+	},
+
+	executeRegister: function(req, res, models, config) {
+		
 	}
 };

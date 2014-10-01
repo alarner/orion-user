@@ -8,27 +8,27 @@ var UAO = {
 	attributes: {
 		userId: {
 			type: 'integer',
-			require: true
+			required: true
 		},
 		authType: {
 			type: 'integer',
-			require: true
+			required: true
 		},
 		authIdentifier: {
 			type: 'string',
-			require: false
+			required: false
 		},
 		authPassword: {
 			type: 'string',
-			require: true
+			required: true
 		},
 		ip: {
 			type: 'string',
-			require: true
+			required: false
 		},
 		expiresAt: {
 			type: 'datetime',
-			require: false
+			required: false
 		},
 
 		changePassword: function(newPassword, cb) {
@@ -180,28 +180,30 @@ UAO.handler[UserAuthType.USERNAME] = {
 
 	},
 
-	register: function(options, cb) {
+	register: function(data, config, UserAuthOption, cb) {
 		var self = this;
-		if(!options.authIdentifier) {
-			return cb({code: UserAuthError.MISSING_IDENTIFIER, message: 'You need to enter a username.'});
-		}
-		else if(!options.authPassword) {
-			return cb({code: UserAuthError.MISSING_PASSWORD, message: 'You need to enter a password.'});
-		}
-		else if(!options.userId) {
-			return cb({code: UserAuthError.MISSING_USER_ID, message: 'Missing user id.'});
-		}
-		UserAuthOption.isRegistered(UserAuthType.USERNAME, options.authIdentifier, function(err, isRegistered) {
+		if(!data.username)
+			return cb(config.errors.USERNAME_REQUIRED);
+		if(!data.password)
+			return cb(config.errors.PASSWORD_REQUIRED);
+		if(!data['confirm-password'])
+			return cb(config.errors.PASSWORD_CONFIRMATION_REQUIRED);
+		if(data.password != data['confirm-password'])
+			return cb(config.errors.PASSWORD_MISMATCH);
+		if(!data.userId)
+			return cb(config.errors.USER_ID_REQUIRED);
+
+		UserAuthOption.isRegistered(UserAuthType.USERNAME, data.username, function(err, isRegistered) {
 			if(err) return cb({code: UserAuthError.UNKNOWN_ERROR, message: err});
 			if(isRegistered) return cb({code: UserAuthError.ALREADY_REGISTERED, message: 'It looks like you have already registered.'});
-			self.generatePassword(options.authPassword, function(err, generatedPassword) {
+			self.generatePassword(data.password, function(err, generatedPassword) {
 				if(err) return error.trace(err, {code: UserAuthError.UNKNOWN_ERROR, message: 'There was an error creating your account.'}, cb);
 				UserAuthOption.create({
-					userId: options.userId,
+					userId: data.userId,
 					authType: UserAuthType.USERNAME,
-					authIdentifier: options.authIdentifier,
+					authIdentifier: data.username,
 					authPassword: generatedPassword,
-					ip: options.req.ip
+					ip: data.ip || null
 				}, function(err, authOption) {
 					if(err) return error.trace(err, {code: UserAuthError.UNKNOWN_ERROR, message: 'There was an error creating your account.'}, cb);
 					cb(null, authOption);

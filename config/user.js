@@ -28,5 +28,6 @@ module.exports = {
 			subject: 'It looks like you forgot your password',
 			templatePath: ''
 		}
-	}
+	},
+	autoLogin: true
 };

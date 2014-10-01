@@ -1,4 +1,5 @@
-module.exports = {
+var async = require('async');
+var User = {
 	authType: {
 		USERNAME: 1
 	},
@@ -148,51 +149,42 @@ module.exports = {
 		return UserAuthOption.handler[type].authenticate(identifier, password, options, cb);
 	},
 
-	register: function(type, options, cb) {
-		if(!UserAuthOption.handler.hasOwnProperty(type)) {
-			return cb({
-				code: this.authError.UNKNOWN_TYPE,
-				message: 'Unknown auth type: '+type
-			}, null);
-		}
+	register: function(type, data, options, UserAuthOption, config, cb) {
+		var self = this;
+		var data = data || {};
+		if(!options) options = {};
+		options.autoLogin = options.autoLogin || config.user.autoLogin;
+
+		if(!UserAuthOption.handler.hasOwnProperty(type))
+			return cb(_.extend({params: {type: type}}, config.errors.UNKNOWN_AUTH_TYPE));
 
 		var newUser = null;
 		async.series({
 			isRegistered: function(cb) {
-				UserAuthOption.isRegistered(User.authType.USERNAME, options.email, function(err, registered) {
-					if(err) return cb({message: 'There was an error while checking if someone has already registered with this email address.'});
-					if(registered) return cb({email: 'It looks like someone has already registered with that email.'});
+				UserAuthOption.isRegistered(User.authType.USERNAME, data.username, function(err, registered) {
+					if(err) return cb(config.errors.CHECKING_IF_REGISTERED);
+					if(registered) return cb(config.errors.ALREADY_REGISTERED);
 					cb();
 				});
 			},
 			user: function(cb) {
-				User.create({
-					firstName: options.firstName,
-					lastName: options.lastName,
-					email: options.email,
-					emailVerified: false,
-					accountVerified: false,
-					accountDisabled: false,
-					dropboxSyncActive: false
-				}, function(err, user) {
-					if(err) return error.trace(JSON.stringify(err), {message: 'There was an error creating your account.'}, cb);
-					newUser = user;
-					cb(null, user);
-				});
+				self.create(
+					data,
+					function(err, user) {
+						if(err) return error.trace(
+							JSON.stringify(err),
+							config.errors.ACCOUNT_CREATION,
+							cb
+						);
+						newUser = user;
+						cb(null, user);
+					}
+				);
 			},
 			userAuthOption: function(cb) {
-				options.userId = newUser.id;
-				UserAuthOption.handler[type].register(options, cb);
-			},
-			subscription: function(cb) {
-				Subscription.create({
-					userId: newUser.id,
-					subscriptionPlanId: 1 // This should be the trial plan
-				}, function(err, subscription) {
-					if(err) return error.trace(JSON.stringify(err), {message: 'There was an error creating your account.'}, cb);
-					newUser.subscriptionId = subscription.id;
-					newUser.save(cb);
-				});
+				data.userId = newUser.id;
+				data.ip = options.ip;
+				UserAuthOption.handler[type].register(data, config, UserAuthOption, cb);
 			}
 		}, function(err, results) {
 			if(err) return cb(err);
@@ -203,7 +195,6 @@ module.exports = {
 			}
 			async.parallel([
 				function(cb) {options.req.user.loadPermissions(cb)},
-				function(cb) {options.req.user.loadSubscription(cb)}
 			],
 			function(err) {
 				if(err) return error.trace(err, cb);
@@ -212,3 +203,5 @@ module.exports = {
 		});
 	}
 };
+
+module.exports = User;
