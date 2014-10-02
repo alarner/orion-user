@@ -1,6 +1,9 @@
 module.exports = {
 	index: function(req, res, models, config) {
-		res.view();
+		res.view({
+			error: req.error(),
+			req: req
+		});
 	},
 
 	execute: function(req, res, models, config) {
@@ -14,6 +17,7 @@ module.exports = {
 			options.autoLogin = true;
 			options.req = req;
 		}
+
 		models.User.register(
 			models.User.authType.USERNAME,
 			req.body,
@@ -21,6 +25,11 @@ module.exports = {
 			models.UserAuthOption,
 			config,
 			function(err, result) {
+				if(err) {
+					res.error(err);
+					return res.redir('/register');
+				}
+				
 				console.log(err, result);
 				res.end();
 			}
