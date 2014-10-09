@@ -13,7 +13,7 @@ module.exports = {
 		req.connection.socket.remoteAddress;
 
 		var options = {ip: ip};
-		if(config.user.autoLogin) {
+		if(config.user.register.autoLogin) {
 			options.autoLogin = true;
 			options.req = req;
 		}
@@ -30,9 +30,12 @@ module.exports = {
 					return res.redir('/register');
 				}
 				
-				console.log(err, result);
-				res.end();
+				return res.redirect(303, config.user.register.redirect || '/');
 			}
 		);
+	},
+
+	test: function(req, res, models, config) {
+		
 	}
 };

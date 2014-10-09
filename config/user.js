@@ -29,5 +29,8 @@ module.exports = {
 			templatePath: ''
 		}
 	},
-	autoLogin: true
+	register: {
+		redirect: '/',
+		autoLogin: true
+	}
 };

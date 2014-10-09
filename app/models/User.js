@@ -43,12 +43,17 @@ var User = {
 			collection: 'UserKey',
 			via: 'userId'
 		},
+		permissions: {
+			collection: 'UserPermission',
+			via: 'userId'
+		},
 
 		isLoggedIn: function() {
 			return this.id ? true : false;
 		},
 
 		loadPermissions: function(cb) {
+			cb();
 			// var self = this;
 			// UserPermission.find({ user_id: this.id }).done(function(err, permissions) {
 			// 	if(!err) {
@@ -161,6 +166,7 @@ var User = {
 		var newUser = null;
 		async.series({
 			isRegistered: function(cb) {
+				console.log('isRegistered');
 				UserAuthOption.isRegistered(User.authType.USERNAME, data.username, function(err, registered) {
 					if(err) return cb(config.errors.CHECKING_IF_REGISTERED);
 					if(registered) return cb(config.errors.ALREADY_REGISTERED);
@@ -168,6 +174,7 @@ var User = {
 				});
 			},
 			user: function(cb) {
+				console.log('user');
 				self.create(
 					data,
 					function(err, user) {
@@ -182,11 +189,13 @@ var User = {
 				);
 			},
 			userAuthOption: function(cb) {
+				console.log('userAuthOption');
 				data.userId = newUser.id;
 				data.ip = options.ip;
 				UserAuthOption.handler[type].register(data, config, UserAuthOption, cb);
 			}
 		}, function(err, results) {
+			console.log('finished');
 			if(err) return cb(err);
 			delete results.isRegistered;
 			if(options.autoLogin && options.req) {
