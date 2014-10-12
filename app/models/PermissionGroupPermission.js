@@ -1,11 +1,8 @@
 module.exports = {
 	attributes: {
-		permissionGroupId: {
-			model: 'PermissionGroup'
-		},
 		pluginPath: {
 			type: 'string',
-			required: true,
+			required: false,
 			defaultsTo: ''
 		},
 		code: {

@@ -7,6 +7,12 @@
     "async": "^0.9.0",
     "bcrypt": "^0.8.0",
     "orion-server": "git://github.com/alarner/orion-server",
-    "sails-disk": "^0.10.4"
+    "sails-disk": "^0.10.4",
+    "sequelize": "^2.0.0-rc1"
+  },
+  "devDependencies": {
+    "chai": "^1.9.2",
+    "sinon": "^1.10.3",
+    "sqlite3": "^3.0.2"
   }
 }
