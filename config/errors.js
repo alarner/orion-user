@@ -34,5 +34,9 @@ module.exports = {
 	PASSWORD_MISMATCH: {
 		code: 'PASSWORD_MISMATCH',
 		message: 'The password and confirmation password did not match.'
+	},
+	UNKNOWN_PERMISSION_GROUP: {
+		code: 'UNKNOWN_PERMISSION_GROUP',
+		message: 'The specified permission group (id={{permissionGroupId}}) could not be found.'
 	}
 };

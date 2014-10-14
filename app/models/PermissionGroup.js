@@ -1,5 +1,6 @@
 var Sequelize = require('sequelize');
 var async = require('async');
+var _ = require('lodash');
 var PermissionGroup = {
 	attributes: {
 		name: {
@@ -26,95 +27,142 @@ var PermissionGroup = {
 		classMethods: {
 			// @todo: make this a transaction
 			add: function(data, parentId, cb) {
-				// var self = this;
-				// var permissions = data.permissions;
-				// delete data.permissions;
-				// async.waterfall([
-				// 	function(cb) {
-				// 		if(!parentId)
-				// 			return cb(null, 1, 2);
+				var self = this;
+				var permissions = data.permissions;
+				var t = null;
+				delete data.permissions;
+				async.waterfall([
+					function(cb) {
+						if(parentId) return cb(null, null, null);
+						// If there is no parent id then the new group
+						// should be a child of the root.
+						self.findOrCreate(
+							{
+								where: { id: 1 },
+								defaults: { name: 'root', lft: 1, rgt: 2 }
+							}
+						).then(function(rootGroup) {
+							var rgt = rootGroup[0].getDataValue('rgt');
+							cb(null, rgt, rgt+1);
+						}, cb);
+					},
+					function(lft, rgt, cb) {
+						self.sequelize.transaction().then(function(transaction) {
+							t = transaction;
+							cb(null, lft, rgt);
+						});
+					},
+					function(lft, rgt, cb) {
+						if(!parentId) return cb(null, lft, rgt);
 
-				// 		self
-				// 		// .transaction()
-				// 		.findOne(parentId)
-				// 		.exec(function(err, parentGroup) {
-				// 			if(err) return cb(err);
-				// 			return cb(null, parentGroup.rgt, parentGroup.rgt+2)
-				// 		});
-				// 	},
-				// 	function(lft, rgt, cb) {
-				// 		// This is a major hack, instead of using UPDATE ... SET
-				// 		// rgt += 2 in one query we are selecting all the necessary 
-				// 		// records and updating each one individually. We have to do
-				// 		// it the hacky way for now because waterline doesn't support
-				// 		// values like this (rgt: { '+' : 2 }) yet.
-				// 		// For more info see: https://github.com/balderdashy/waterline/issues/86
-				// 		async.parallel([
-				// 			function(cb) {
-				// 				self.find({
-				// 					rgt: { '>=' : lft }
-				// 				}).exec(function(err, groups) {
-				// 					if(err) return cb(err);
-				// 					async.each(groups, function(group, cb) {
-				// 						group.rgt += 2;
-				// 						group.save(cb);
-				// 					}, cb);
-				// 				});
-				// 			},
-				// 			function(cb) {
-				// 				self.find({
-				// 					lft: { '>=' : lft }
-				// 				}).exec(function(err, groups) {
-				// 					if(err) return cb(err);
-				// 					async.each(groups, function(group, cb) {
-				// 						group.lft += 2;
-				// 						group.save(cb);
-				// 					}, cb);
-				// 				});
-				// 			}
-				// 		], function(err) {
-				// 			cb(err, lft, rgt);
-				// 		});
-				// 	},
-				// 	function(lft, rgt, cb) {
-				// 		data.lft = lft;
-				// 		data.rgt = rgt;
-				// 		self.create(data).exec(cb);
-				// 	},
-				// 	function(newGroup, cb){
-				// 		if(!permissions) return cb(newGroup);
-				// 		permissions.forEach(function(permission) {
-				// 			permission.permissionGroupId = newGroup.id;
-				// 		});
+						self.find({
+							where: { id: parentId },
+							attributes: ['lft', 'rgt']
+						}, { transaction: t }).then(function(parentGroup) {
+							if(!parentGroup) 
+								return cb(config.errors.UNKNOWN_PERMISSION_GROUP);
+							var rgt = parentGroup.getDataValue('rgt');
+							cb(null, rgt, rgt+1);
+						}, cb);
+					},
+					function(lft, rgt, cb) {
+						async.parallel([
+							function(cb) {
+								var query = 'UPDATE permission_group SET rgt=rgt+2 WHERE rgt >= ?';
+								self.sequelize.query(
+									query,
+									self.models.get('PermissionGroup'),
+									{ transaction: t },
+									[lft]
+								).then(function() {
+									cb();
+								}, cb);
+							},
+							function(cb) {
+								var query = 'UPDATE permission_group SET lft=lft+2 WHERE lft >= ?';
+								self.sequelize.query(
+									query,
+									self.models.get('PermissionGroup'),
+									{ transaction: t },
+									[lft]
+								).then(function() {
+									cb();
+								}, cb);
+							}
+						], function(err) {
+							cb(err, lft, rgt);
+						});
+					},
+					function(lft, rgt, cb) {
+						data.lft = lft;
+						data.rgt = rgt;
+						self.create(data, { transaction: t }).then(function(newGroup) {
+							cb(null, newGroup);
+						}, cb);
+					},
+					function(newGroup, cb){
+						if(!permissions || !permissions.length)
+							return cb(null, newGroup, []);
 
-				// 		PermissionGroupPermission
-				// 		// .transaction()
-				// 		.create(permissions)
-				// 		.exec(function(err, newPermissions) {
-				// 			return cb(err, newGroup, newPermissions);
-				// 		});
-				// 	}
-				// ], function(err, group, permissions) {
-				// 	async.parallel({
-				// 		group: function(cb) {
-				// 			// if(err) return group.rollback(cb);
-				// 			// return group.commit(cb);
-				// 			cb();
-				// 		},
-				// 		permissions: function(cb) {
-				// 			// async.each(permissions, function(permission, cb) {
-				// 			// 	if(err) return; //permission.rollback(cb);
-				// 			// 	return; //permission.commit(cb);
-				// 			// }, cb);
-				// 			cb();
-				// 		}
-				// 	}, function(err2) {
-				// 		if(err) return cb(err);
-				// 		if(err2) return cb(err2);
-				// 		return cb(null, group, permissions);
-				// 	});
-				// });
+						permissions.forEach(function(permission) {
+							permission.permissionGroupId = newGroup.id;
+						});
+
+						self.models.get('PermissionGroupPermission')
+						.bulkCreate(permissions, { transaction: t })
+						.then(function(newPermissions) {
+							return cb(null, newGroup, newPermissions);
+						}, cb);
+					}
+				], function(err, group, permissions) {
+					if(!err) {
+						t.commit().then(function() {
+							cb(null, group, permissions);
+						}, function(err) {
+							cb(err);
+						});
+						return;
+					}
+
+					console.log(err);
+					return t.rollback().then(function() {
+						cb(err);
+					}, cb);
+				});
 			},
+
+			hierarchy: function(parentId, cb) {
+				var self = this;
+				if(_.isFunction(parentId)) {
+					cb = parentId;
+					parentId = 1;
+				}
+				var query = '\
+				SELECT node.*\
+				FROM permission_group AS node\
+				JOIN permission_group AS parent\
+				WHERE parent.id = ?\
+				ORDER BY node.lft\
+				';
+				self.sequelize.query(
+					query,
+					self.models.get('PermissionGroup'),
+					{},
+					[parentId]
+				).then(function(results) {
+					console.log(results.length);
+					cb(null, results);
+				}, cb);
+				// self.findAll({
+				// 	where: { id: parentId },
+				// 	attributes: ['lft', 'rgt']
+				// })
+				// SELECT node.*
+				// FROM permission_group AS node,
+				// JOIN permission_group AS parent
+				// WHERE parent.id = 1
+				// ORDER BY node.lft;
+			}
 		}
 	}
 };
