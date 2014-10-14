@@ -1,0 +1,19 @@
+{{#extend "bootstrap"}}
+	{{#append "head"}}
+		<link rel="stylesheet" href="/css/permission/index.css" />
+	{{/append}}
+	{{#replace "body"}}
+		<div class="container" ng-app="permission">
+			<div ui-view></div>
+		</div>
+	{{/replace}}
+	{{#append "scripts"}}
+		<script src="/lib/angularjs/angular.min.js"></script>
+		<script src="/lib/angular-ui-router/release/angular-ui-router.min.js"></script>
+		<script src="/lib/angular.treeview/angular.treeview.min.js"></script>		
+		<script src="/js/permission/app.js"></script>
+		<script src="/js/permission/controllers.js"></script>
+		<script src="/js/permission/services.js"></script>
+		<script>angular.module('permission.data', []).value('PermissionGroups', {{{json groups}}});</script>
+	{{/append}}
+{{/extend}}

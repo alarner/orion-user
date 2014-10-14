@@ -174,6 +174,19 @@ var PermissionGroup = {
 
 				}, cb);
 			}
+		},
+
+		instanceMethods: {
+			toObject: function() {
+				var obj = this.toJSON();
+				if(this.children) {
+					obj.children = [];
+					this.children.forEach(function(child) {
+						obj.children.push(child.toObject());
+					});
+				}
+				return obj;
+			}
 		}
 	}
 };
