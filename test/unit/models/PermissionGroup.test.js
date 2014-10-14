@@ -6,7 +6,7 @@ describe('PermissionGroup', function() {
 	before(require('../../beforeModel'));
 	// beforeEach(require('../beforeEach'));
 
-	describe('when we add a permission group with no parent', function() {
+	describe('when we add a permission group', function() {
 		it('it should work', function(done) {
 			assert(this.model.get('PermissionGroup'));
 			var self = this;
@@ -69,7 +69,21 @@ describe('PermissionGroup', function() {
 							assert.equal(groups[3].getDataValue('name'), 'test3');
 							assert.equal(groups[3].getDataValue('lft'), 5);
 							assert.equal(groups[3].getDataValue('rgt'), 6);
-							done();
+
+							self.model.get('PermissionGroup').hierarchy(function(err, hierarchy) {
+								assert.equal(hierarchy.getDataValue('id'), 1);
+								var child = hierarchy.children[0];
+								assert.isDefined(child);
+								assert.equal(child.getDataValue('id'), 2);
+								assert.deepEqual(child.children, []);
+								var child = hierarchy.children[1];
+								assert.isDefined(child);
+								assert.equal(child.getDataValue('id'), 3);
+								var child = child.children[0];
+								assert.isDefined(child);
+								assert.equal(child.getDataValue('id'), 4);
+								done();
+							});
 						});
 					});
 				});

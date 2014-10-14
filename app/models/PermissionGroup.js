@@ -25,7 +25,6 @@ var PermissionGroup = {
 	options: {
 		paranoid: true,
 		classMethods: {
-			// @todo: make this a transaction
 			add: function(data, parentId, cb) {
 				var self = this;
 				var permissions = data.permissions;
@@ -124,7 +123,6 @@ var PermissionGroup = {
 						return;
 					}
 
-					console.log(err);
 					return t.rollback().then(function() {
 						cb(err);
 					}, cb);
@@ -150,18 +148,31 @@ var PermissionGroup = {
 					{},
 					[parentId]
 				).then(function(results) {
-					console.log(results.length);
-					cb(null, results);
+					if(results.length == 0) return false;
+					if(results.length == 1) {
+						results[0].children = [];
+						return results[0];
+					}
+					var root = results[0];
+					root.children = [];
+					var parent = root;
+					for(var i=1; i<results.length; i++) {
+						var target = results[i];
+
+						// Move up the tree
+						while(target.getDataValue('rgt') > parent.rgt)
+							parent = parent.parent;
+
+						target.parent = parent;
+						target.children = [];
+						parent.children.push(target);
+
+						// Move down the tree
+						parent = target;
+					}
+					cb(null, root);
+
 				}, cb);
-				// self.findAll({
-				// 	where: { id: parentId },
-				// 	attributes: ['lft', 'rgt']
-				// })
-				// SELECT node.*
-				// FROM permission_group AS node,
-				// JOIN permission_group AS parent
-				// WHERE parent.id = 1
-				// ORDER BY node.lft;
 			}
 		}
 	}
