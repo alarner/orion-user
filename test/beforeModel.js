@@ -6,10 +6,12 @@ module.exports = function(done) {
 	var self = this;
 	var root = path.join(__dirname, '..');
 	this.config = configLoader(root, root);
+	this.config.database.storage = 'test/fixtures/database.sqlite';
+	this.config.database.logging = false;
 	this.model = new Model(this.config);
 	this.model.load();
-	this.model.sequelize.sync({force: true}).then(function() {
-		done();
-	});
-
+	done();
+	// this.model.sequelize.sync({force: true}).then(function() {
+	// 	done();
+	// });
 };

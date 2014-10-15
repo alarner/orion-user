@@ -71,7 +71,7 @@ var PermissionGroup = {
 								var query = 'UPDATE permission_group SET rgt=rgt+2 WHERE rgt >= ?';
 								self.sequelize.query(
 									query,
-									self.models.get('PermissionGroup'),
+									self.model.get('PermissionGroup'),
 									{ transaction: t },
 									[lft]
 								).then(function() {
@@ -82,7 +82,7 @@ var PermissionGroup = {
 								var query = 'UPDATE permission_group SET lft=lft+2 WHERE lft >= ?';
 								self.sequelize.query(
 									query,
-									self.models.get('PermissionGroup'),
+									self.model.get('PermissionGroup'),
 									{ transaction: t },
 									[lft]
 								).then(function() {
@@ -108,7 +108,7 @@ var PermissionGroup = {
 							permission.permissionGroupId = newGroup.id;
 						});
 
-						self.models.get('PermissionGroupPermission')
+						self.model.get('PermissionGroupPermission')
 						.bulkCreate(permissions, { transaction: t })
 						.then(function(newPermissions) {
 							return cb(null, newGroup, newPermissions);
@@ -145,7 +145,7 @@ var PermissionGroup = {
 				';
 				self.sequelize.query(
 					query,
-					self.models.get('PermissionGroup'),
+					self.model.get('PermissionGroup'),
 					{},
 					[parentId]
 				).then(function(results) {
@@ -173,6 +173,42 @@ var PermissionGroup = {
 					}
 					cb(null, root);
 
+				}, cb);
+			},
+
+			flatten: function(permissionGroupId, cb) {
+				var query = '\
+				SELECT p.*, parent.id AS permissionGroupId, parent.name AS permissionGroupName\
+				FROM permission_group AS node\
+				JOIN permission_group AS parent\
+				INNER JOIN permission_group_permission AS p ON p.permissionGroupId = parent.id\
+				WHERE\
+					node.lft >= parent.lft AND\
+					node.lft <= parent.rgt AND\
+					node.id = ?\
+				ORDER BY node.lft';
+				console.log(query);
+				this.sequelize.query(
+					query,
+					this.model.get('PermissionGroupPermission'),
+					{},
+					[permissionGroupId]
+				).then(function(permissions) {
+					var permissionMap = {};
+					permissions.forEach(function(permission) {
+						var pluginPath = permission.getDataValue('pluginPath');
+						if(!permissionMap.hasOwnProperty(pluginPath))
+							permissionMap[pluginPath] = {};
+
+						permissionMap[pluginPath][permission.getDataValue('code')] = {
+							value: permission.getDataValue('value'),
+							permissionGroup: {
+								id: permission.getDataValue('permissionGroupId'),
+								name: permission.getDataValue('permissionGroupName')
+							}
+						};
+					});
+					cb(null, permissionMap);
 				}, cb);
 			}
 		},
