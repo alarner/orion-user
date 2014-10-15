@@ -9,3 +9,9 @@
   color: #FFF;
   background-color: #D9534F;
   border-color: #D43F3A; }
+
+#tree li span:nth-of-type(2) {
+  display: inline-block;
+  min-width: 14px; }
+#tree li.list-group-item:first-child span:nth-child(2) {
+  display: inline; }

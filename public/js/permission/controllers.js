@@ -20,7 +20,7 @@ angular.module('permission.controllers', ['permission.data', 'permission.service
 		data: [nodes],
 		expandIcon: 'glyphicon glyphicon-chevron-right',
 		collapseIcon: 'glyphicon glyphicon-chevron-down',
-		emptyIcon: '',
+		emptyIcon: 'glyphicon glyphicon-th',
 		nodeIcon:''
 	});
 
@@ -89,13 +89,5 @@ angular.module('permission.controllers', ['permission.data', 'permission.service
 	PermissionGroupAPI.get({ id: $stateParams.id }).$promise.then(function(pg) {
 		$scope.loading = false;
 		$scope.groupPermissions = pg.data;
-		console.log($scope.groupPermissions);
     });
-
-	// var permissionGroup = null;
-	// $rootScope.$on('GROUP_SELECTED', function(e, group) {
-	// 	console.log('test');
-	// 	$state.go('permission-group', {id: group.id});
-	// 	permissionGroup = group;
-	// });
 });

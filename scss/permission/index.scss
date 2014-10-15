@@ -17,3 +17,16 @@
 		}
 	}
 }
+
+#tree {
+	li {
+		span:nth-of-type(2) {
+			display: inline-block;
+			min-width: 14px;
+		}
+
+		&.list-group-item:first-child span:nth-child(2) {
+			display: inline;
+		}
+	}
+}
