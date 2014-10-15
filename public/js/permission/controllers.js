@@ -34,7 +34,8 @@ angular.module('permission.controllers', ['permission.data'])
 
 })
 
-.controller('PermissionGroupCtrl', function($scope, $rootScope, $stateParams) {
+.controller('PermissionGroupCtrl', function($scope, $rootScope, $stateParams, AvailablePermissions) {
+	$scope.availablePermissions = AvailablePermissions;
 	// var permissionGroup = null;
 	// $rootScope.$on('GROUP_SELECTED', function(e, group) {
 	// 	console.log('test');

@@ -5,10 +5,10 @@
 	{{#replace "body"}}
 		<div class="container" ng-app="permission">
 			<div class="row">
-				<div class="col-sm-4" ng-controller="TreeCtrl">
+				<div class="col-sm-3" ng-controller="TreeCtrl">
 					<div id="tree"></div>
 				</div>
-				<div class="col-sm-8" ui-view>
+				<div class="col-sm-9" ui-view>
 				</div>
 			</div>
 		</div>
@@ -20,6 +20,10 @@
 		<script src="/js/permission/app.js"></script>
 		<script src="/js/permission/controllers.js"></script>
 		<script src="/js/permission/services.js"></script>
-		<script>angular.module('permission.data', []).value('PermissionGroups', {{{json groups}}});</script>
+		<script>
+			angular.module('permission.data', [])
+				.value('PermissionGroups', {{{json groups}}})
+				.value('AvailablePermissions', {{{json availablePermissions}}});
+		</script>
 	{{/append}}
 {{/extend}}

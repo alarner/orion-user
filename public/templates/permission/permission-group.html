@@ -1,1 +1,37 @@
-permission-group.html
+<div>
+	<div class="well" ng-repeat="pluginPermissions in availablePermissions">
+		<strong>{{pluginPermissions.title}}</strong>
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Value</th>
+					<th>Description</th>
+					<th>Code</th>
+					<th>Inherited</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="permission in pluginPermissions.permissions">
+					<td class="value-buttons">
+						<div class="btn-group" data-toggle="buttons">
+							<label class="btn btn-primary btn-sm active">
+								<input type="radio" name="value" checked> Inherit
+							</label>
+							<label class="btn btn-primary btn-sm">
+								<input type="radio" name="value"> Grant
+							</label>
+							<label class="btn btn-primary btn-sm">
+								<input type="radio" name="value"> Deny
+							</label>
+						</div>
+					</td>
+					<td>{{ permission.description }}</td>
+					<td>{{ permission.code }}</td>
+					<td>--</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<!--
+	-->
+</div>

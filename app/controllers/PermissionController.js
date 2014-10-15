@@ -1,8 +1,26 @@
+var _ = require('lodash');
 module.exports = {
 	index: function(req, res, model, config) {
 		model.get('PermissionGroup').hierarchy(function(err, groups) {
+			var getAvailablePermissions = function(config, pluginPath) {
+				pluginPath = pluginPath || ['Application'];
+				var availablePermissions = [];
+				availablePermissions.push({
+					title: pluginPath.join(' > '),
+					permissions: config.permissions || {}
+				});
+
+				_.forOwn(config.plugins, function(pluginConfig, key) {
+					var newPluginPath = pluginPath.slice(0);
+					newPluginPath.push(key);
+					availablePermissions.concat(getAvailablePermissions(pluginConfig, newPluginPath));
+				});
+				return availablePermissions;
+			};
+
 			res.view({
-				groups: groups.toJSON()
+				groups: groups.toJSON(),
+				availablePermissions: getAvailablePermissions(config.globalConfig)
 			});
 		});
 	},
