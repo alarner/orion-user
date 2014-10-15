@@ -17,13 +17,15 @@
 		<script src="/lib/bootstrap-treeview/dist/bootstrap-treeview.min.js"></script>
 		<script src="/lib/angularjs/angular.min.js"></script>
 		<script src="/lib/angular-ui-router/release/angular-ui-router.min.js"></script>
+		<script src="/lib/angular-resource/angular-resource.min.js"></script>
 		<script src="/js/permission/app.js"></script>
 		<script src="/js/permission/controllers.js"></script>
 		<script src="/js/permission/services.js"></script>
 		<script>
 			angular.module('permission.data', [])
 				.value('PermissionGroups', {{{json groups}}})
-				.value('AvailablePermissions', {{{json availablePermissions}}});
+				.value('AvailablePermissions', {{{json availablePermissions}}})
+				.value('Host', '{{ host }}');
 		</script>
 	{{/append}}
 {{/extend}}

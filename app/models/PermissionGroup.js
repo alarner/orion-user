@@ -186,8 +186,7 @@ var PermissionGroup = {
 					node.lft >= parent.lft AND\
 					node.lft <= parent.rgt AND\
 					node.id = ?\
-				ORDER BY node.lft';
-				console.log(query);
+				ORDER BY parent.lft ASC';
 				this.sequelize.query(
 					query,
 					this.model.get('PermissionGroupPermission'),

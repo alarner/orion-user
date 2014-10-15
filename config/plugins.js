@@ -1,11 +1,6 @@
 module.exports = {
-	'orion-api': {}
-	/*
-	'orion-test-plugin': {
-		prefix: {
-			route: '/test',
-			model: 'test_'
-		}
+	'orion-api': {
+		// route: '/api',
+		// model: 'api_'
 	}
-	*/
 };

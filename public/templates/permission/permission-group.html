@@ -1,9 +1,13 @@
-<div>
+<div ng-show="loading">
+	loading...
+</div>
+<div ng-show="!loading">
 	<div class="well" ng-repeat="pluginPermissions in availablePermissions">
 		<strong>{{pluginPermissions.title}}</strong>
 		<table class="table">
 			<thead>
 				<tr>
+					<th>Setting</th>
 					<th>Value</th>
 					<th>Description</th>
 					<th>Code</th>
@@ -14,16 +18,19 @@
 				<tr ng-repeat="permission in pluginPermissions.permissions">
 					<td class="value-buttons">
 						<div class="btn-group" data-toggle="buttons">
-							<label class="btn btn-primary btn-sm active">
-								<input type="radio" name="value" checked> Inherit
+							<label class="btn btn-default btn-sm" ng-class="checkInherit(pluginPermissions.lookup, permission.code)">
+								<input type="radio" name="value"> Inherit
 							</label>
-							<label class="btn btn-primary btn-sm">
+							<label class="btn btn-default btn-sm" ng-class="checkGrant(pluginPermissions.lookup, permission.code)">
 								<input type="radio" name="value"> Grant
 							</label>
-							<label class="btn btn-primary btn-sm">
+							<label class="btn btn-default btn-sm" ng-class="checkDeny(pluginPermissions.lookup, permission.code)">
 								<input type="radio" name="value"> Deny
 							</label>
 						</div>
+					</td>
+					<td>
+						<span class="label label-default" ng-class="getValue(pluginPermissions.lookup, permission.code) ? 'label-success' : 'label-danger'">{{ getValue(pluginPermissions.lookup, permission.code) ? 'GRANT' : 'DENY' }}</span>
 					</td>
 					<td>{{ permission.description }}</td>
 					<td>{{ permission.code }}</td>
