@@ -1,4 +1,5 @@
 module.exports = {
+	'orion-api': {}
 	/*
 	'orion-test-plugin': {
 		prefix: {

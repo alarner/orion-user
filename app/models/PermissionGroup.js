@@ -19,7 +19,8 @@ var PermissionGroup = {
 			type: 'association',
 			method: 'hasMany',
 			model: 'PermissionGroupPermission',
-			as: 'permissions'
+			as: 'permissions',
+			foreignKey: 'permissionGroupId'
 		}
 	},
 	options: {
@@ -177,12 +178,19 @@ var PermissionGroup = {
 		},
 
 		instanceMethods: {
-			toObject: function() {
-				var obj = this.toJSON();
+			toJSON: function() {
+				 var obj = this.values;
 				if(this.children) {
 					obj.children = [];
 					this.children.forEach(function(child) {
-						obj.children.push(child.toObject());
+						obj.children.push(child.toJSON());
+					});
+				}
+
+				if(this.permissions) {
+					obj.permissions = [];
+					this.permissions.forEach(function(permission) {
+						obj.permissions.push(permission.toJSON());
 					});
 				}
 				return obj;
