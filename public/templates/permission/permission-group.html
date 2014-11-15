@@ -34,7 +34,10 @@
 					</td>
 					<td>{{ permission.description }}</td>
 					<td>{{ permission.code }}</td>
-					<td>--</td>
+					<td>
+						<span ng-show="checkInherit(pluginPermissions.lookup, permission.code) != 'active' || (permissionGroupId == 1)">--</span>
+						<a ng-href="#/permission-group/{{groupPermissions[pluginPermissions.lookup][permission.code].permissionGroup.id || 1}}" ng-show="checkInherit(pluginPermissions.lookup, permission.code) == 'active' && (permissionGroupId != 1)">{{ groupPermissions[pluginPermissions.lookup][permission.code].permissionGroup.name || 'root' }}</a>
+					</td>
 				</tr>
 			</tbody>
 		</table>
