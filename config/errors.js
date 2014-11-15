@@ -61,12 +61,22 @@ module.exports = {
 	},
 	MISSING_PERMISSION_CODE: {
 		code: 'MISSING_PERMISSION_CODE',
-		message: 'The permission value must be passed as a parameter to this request.',
+		message: 'The permission code must be passed as a parameter to this request.',
 		status: 400
 	},
 	MISSING_PERMISSION_VALUE: {
 		code: 'MISSING_PERMISSION_VALUE',
+		message: 'The permission value must be passed in the body of this request.',
+		status: 400
+	},
+	INVALID_PERMISSION_VALUE: {
+		code: 'INVALID_PERMISSION_VALUE',
 		message: 'The permission value must "inherit", "grant" or "deny".',
 		status: 400
+	},
+	UNKNOWN_ERROR: {
+		code: 'UNKNOWN_ERROR',
+		message: 'An unknown error occurred.',
+		status: 500
 	}
 };

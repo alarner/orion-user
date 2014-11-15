@@ -1,6 +1,7 @@
 var sinon 	= require('sinon');
-module.exports = {
-	info: {
+module.exports = function() {
+	this.info = {
 		params: {}
-	}
+	};
+	this.body = {};
 };

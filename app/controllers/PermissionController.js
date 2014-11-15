@@ -36,7 +36,6 @@ module.exports = {
 	},
 
 	groupPermission: function(req, res, model, config) {
-		console.log('groupPermission');
 		if(!req.info.params.groupId)
 			return res.api.setError(config.errors.MISSING_PERMISSION_GROUP_ID).send();
 
@@ -78,12 +77,14 @@ module.exports = {
 					value: targetVal
 				}
 			}).then(function(permission) {
+				if(!_.isArray(permission)) {
+					return res.api.setError(config.errors.UNKNOWN_ERROR).send();
+				}
 				permission = permission[0];
 				// @todo: do this in one query instead of two
 				if(permission.value != targetVal) {
 					permission.setDataValue('value', targetVal);
 					permission.save().then(function() {
-						console.log(arguments);
 						model.get('PermissionGroup').flatten(req.info.params.groupId, function(err, permissionGroup) {
 							res.api.setData(permissionGroup).send();
 						});
