@@ -26,7 +26,7 @@ var PermissionGroup = {
 	options: {
 		paranoid: true,
 		classMethods: {
-			add: function(data, parentId, cb) {
+			add: function(data, parentId, config, cb) {
 				var self = this;
 				var permissions = data.permissions;
 				var t = null;
@@ -126,7 +126,7 @@ var PermissionGroup = {
 
 					return t.rollback().then(function() {
 						cb(err);
-					}, cb);
+					});
 				});
 			},
 
