@@ -51,7 +51,22 @@ module.exports = {
 	},
 	MISSING_PERMISSION_GROUP_ID: {
 		code: 'MISSING_PERMISSION_GROUP_ID',
-		message: 'The permission id must be passed as a parameter to this request.',
+		message: 'The permission group id must be passed as a parameter to this request.',
+		status: 400
+	},
+	MISSING_PERMISSION_PLUGIN_PATH: {
+		code: 'MISSING_PERMISSION_PLUGIN_PATH',
+		message: 'The plugin path must be passed as a parameter to this request.',
+		status: 400
+	},
+	MISSING_PERMISSION_CODE: {
+		code: 'MISSING_PERMISSION_CODE',
+		message: 'The permission value must be passed as a parameter to this request.',
+		status: 400
+	},
+	MISSING_PERMISSION_VALUE: {
+		code: 'MISSING_PERMISSION_VALUE',
+		message: 'The permission value must "inherit", "grant" or "deny".',
 		status: 400
 	}
 };

@@ -4,6 +4,8 @@ module.exports = {
 		defaultAction: 'index'
 	},
 	routes: {
+		'/permission/group/:groupId/:permissionCode': 'PermissionController.groupPermission',
+		'/permission/group/:groupId/:pluginPath/:permissionCode': 'PermissionController.groupPermission',
 		'get /fancy': 'CustomController.fancy',
 		'post /fancy': 'CustomController.postFancy',
 		'put /cstm/:id': 'CustomController.putWithId',

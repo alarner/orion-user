@@ -34,10 +34,11 @@ angular.module('permission.controllers', ['permission.data', 'permission.service
 
 })
 
-.controller('PermissionGroupCtrl', function($scope, $rootScope, $stateParams, AvailablePermissions, PermissionGroupAPI) {
+.controller('PermissionGroupCtrl', function($scope, $rootScope, $stateParams, AvailablePermissions, PermissionGroupAPI, PermissionGroupPermissionAPI) {
 	$scope.availablePermissions = AvailablePermissions;
 	$scope.groupPermissions = null;
 	$scope.loading = true;
+	$scope.permissionGroupId = $stateParams.id;
 
 	$scope.checkInherit = function(pluginPath, permissionCode) {
 		if(!$scope.groupPermissions)
@@ -84,10 +85,24 @@ angular.module('permission.controllers', ['permission.data', 'permission.service
 		if(!$scope.groupPermissions[pluginPath].hasOwnProperty(permissionCode))
 			return false;
 		return $scope.groupPermissions[pluginPath][permissionCode].value ? true : false;
-	}
+	};
+
+	$scope.setPermission = function(permissionGroupId, pluginPath, permissionCode, value) {
+		PermissionGroupPermissionAPI.post({
+			groupId: permissionGroupId,
+			pluginPath: pluginPath,
+			permissionCode: permissionCode,
+			value: value
+		}).$promise.then(function(pg) {
+			$scope.loading = false;
+			$scope.groupPermissions = pg.data;
+	    });
+	};
 
 	PermissionGroupAPI.get({ id: $stateParams.id }).$promise.then(function(pg) {
 		$scope.loading = false;
 		$scope.groupPermissions = pg.data;
     });
+
+
 });

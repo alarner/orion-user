@@ -18,13 +18,13 @@
 				<tr ng-repeat="permission in pluginPermissions.permissions">
 					<td class="value-buttons">
 						<div class="btn-group" data-toggle="buttons">
-							<label class="btn btn-default btn-sm" ng-class="checkInherit(pluginPermissions.lookup, permission.code)">
+							<label class="btn btn-default btn-sm" ng-class="checkInherit(pluginPermissions.lookup, permission.code)" ng-click="setPermission(permissionGroupId, pluginPermissions.lookup, permission.code, 'inherit')">
 								<input type="radio" name="value"> Inherit
 							</label>
-							<label class="btn btn-default btn-sm" ng-class="checkGrant(pluginPermissions.lookup, permission.code)">
+							<label class="btn btn-default btn-sm" ng-class="checkGrant(pluginPermissions.lookup, permission.code)" ng-click="setPermission(permissionGroupId, pluginPermissions.lookup, permission.code, 'grant')">
 								<input type="radio" name="value"> Grant
 							</label>
-							<label class="btn btn-default btn-sm" ng-class="checkDeny(pluginPermissions.lookup, permission.code)">
+							<label class="btn btn-default btn-sm" ng-class="checkDeny(pluginPermissions.lookup, permission.code)" ng-click="setPermission(permissionGroupId, pluginPermissions.lookup, permission.code, 'deny')">
 								<input type="radio" name="value"> Deny
 							</label>
 						</div>
