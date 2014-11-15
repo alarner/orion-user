@@ -4,6 +4,9 @@ module.exports = function(done) {
 	fs.copy(
 		path.join(__dirname, 'fixtures', 'fresh.sqlite'), 
 		path.join(__dirname, 'fixtures', 'database.sqlite'),
-		done
+		function(err) {
+			if(err) console.trace(err);
+			done();
+		}
 	);
 };

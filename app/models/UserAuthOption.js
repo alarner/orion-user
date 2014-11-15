@@ -1,3 +1,148 @@
+var Sequelize = require('sequelize');
+var async = require('async');
+var _ = require('lodash');
+var bcrypt = require('bcrypt');
+var User = require('./User');
+
+// @todo: add error handling to all promises
+
+var UserAuthOption = {
+	attributes: {
+		authType: {
+			type: Sequelize.INTEGER,
+			allowNull: false
+		},
+		authIdentifier: {
+			type: Sequelize.STRING,
+			allowNull: true
+		},
+		authPassword: {
+			type: Sequelize.STRING,
+			allowNull: false
+		},
+		ip: {
+			type: Sequelize.STRING,
+			allowNull: true
+		},
+		expiresAt: {
+			type: Sequelize.DATE,
+			allowNull: true
+		}
+	},
+	options: {
+		paranoid: true,
+		classMethods: {
+			changePassword: function(newPassword, cb) {
+				// var self = this;
+				// UAO.handler[this.authType].generatePassword(newPassword, function(err, generatedPassword) {
+				// 	if(err) return error.trace(err, cb);
+				// 	self.authPassword = generatedPassword;
+				// 	self.save(cb);
+				// });
+			}
+		},
+
+		// instanceMethods: {
+		// 	toJSON: function() {
+		// 		 var obj = this.values;
+		// 		if(this.children) {
+		// 			obj.children = [];
+		// 			this.children.forEach(function(child) {
+		// 				obj.children.push(child.toJSON());
+		// 			});
+		// 		}
+
+		// 		if(this.permissions) {
+		// 			obj.permissions = [];
+		// 			this.permissions.forEach(function(permission) {
+		// 				obj.permissions.push(permission.toJSON());
+		// 			});
+		// 		}
+		// 		return obj;
+		// 	}
+		// }
+	}
+};
+
+var Handlers = {};
+Handlers[User.authType.USERNAME] = {
+	authenticate: function(identifier, plaintextPassword, options, config, cb) {
+		var self = this;
+		async.waterfall({
+			checkAttempts: function(cb) {
+				// @todo: use count instead of selecting all the rows
+				self.model.get('UserAuthAttempt').findAll({
+					where: {
+						authType: User.authType.USERNAME,
+						authIdentifier: identifier,
+						//authError: '!= NULL', // @todo: fix this
+						//createdAt: '> DATE_SUB(NOW(), INTERVAL ? MINUTE)' // @todo: fix this
+					}
+				}).then(function(attempts) {
+					if(attempts.length >= config.user.loginAttempts.max) {
+						return cb(_.extend(
+							{params: {
+								max: config.user.loginAttempts.max,
+								timeInterval: config.user.loginAttempts.timeInterval
+							}},
+							config.errors.MAX_FAILED_ATTEMPTS
+						));
+					}
+					cb();
+				});
+			},
+			authOption: function(cb) {
+				self.find({
+					where: {
+						authType: User.authType.USERNAME,
+						authIdentifier: identifier
+					}
+				}).then(function(authOption) {
+					if(!authOption) {
+						return cb(config.errors.UNKNOWN_IDENTIFIER);
+					}
+
+					bcrypt.compare(plaintextPassword, authOption.getDataValue('authPassword'), function(err, res) {
+						if(err) {
+							return cb(_.extend({params: {error: err}}, config.errors.BCRYPT));
+						}
+						else if(!res) {
+							return cb(config.errors.INVALID_PASSWORD);
+						}
+						else {
+							return cb(null, authOption);
+						}
+					});
+				});
+			}
+		}, function(err, results) {
+			var attempt = {
+				authType: UserAuthType.USERNAME,
+				authIdentifier: identifier,
+				ip: options.ip || null
+			};
+			if(err) {
+				attempt.authError = err.code;
+			}
+
+			self.model.get('UserAuthAttempt').create(attempt).then(function(userAuthAttempt) {
+				if(err) return cb(err);
+				self.model.get('User').find({
+					where: {
+						id: results.authOption.userId
+					}
+				}).then(function(user) {
+					cb(null, user);
+				});
+			});
+		});
+	}
+};
+
+UserAuthOption.handler = Handlers;
+
+module.exports = UserAuthOption;
+
 // var async = require('async');
 // var bcrypt = require('bcrypt');
 // var crypto = require('crypto');

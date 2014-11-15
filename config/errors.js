@@ -1,3 +1,4 @@
+// @todo: fix status codes
 module.exports = {
 	UNKNOWN_AUTH_TYPE: {
 		code: 'UNKNOWN_AUTH_TYPE',
@@ -11,7 +12,7 @@ module.exports = {
 	},
 	ALREADY_REGISTERED: {
 		code: 'ALREADY_REGISTERED',
-		message: 'It looks like someone has already registered with that username.',
+		message: 'It looks like someone has already registered with the username "{{username}}".',
 		status: 400
 	},
 	ACCOUNT_CREATION: {
@@ -78,5 +79,25 @@ module.exports = {
 		code: 'UNKNOWN_ERROR',
 		message: 'An unknown error occurred.',
 		status: 500
+	},
+	MAX_FAILED_ATTEMPTS: {
+		code: 'MAX_FAILED_ATTEMPTS',
+		message: 'You have made too many ({{max}}) failed log in attempts in the last {{timeInterval}} minutes.',
+		status: 500
+	},
+	UNKNOWN_IDENTIFIER: {
+		code: 'UNKNOWN_IDENTIFIER',
+		message: 'We can\'t find the username you entered. Please try a different one.',
+		status: 400
+	},
+	BCRYPT: {
+		code: 'BCRYPT',
+		message: 'There was a problem with bcrypt: {{error}}',
+		status: 500
+	},
+	INVALID_PASSWORD: {
+		code: 'INVALID_PASSWORD',
+		message: 'The password you entered is not correct.',
+		status: 400
 	}
 };

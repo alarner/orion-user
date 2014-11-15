@@ -1,3 +1,146 @@
+var Sequelize = require('sequelize');
+var async = require('async');
+var _ = require('lodash');
+var UserAuthOption = require('./UserAuthOption');
+var User = {
+	authType: {
+		USERNAME: 1
+	},
+	attributes: {
+		email: {
+			type: Sequelize.STRING,
+			allowNull: false
+		},
+		emailVerified: {
+			type: Sequelize.BOOLEAN,
+			allowNull: false
+			// @todo: set default to false
+		},
+		accountVerified: {
+			type: Sequelize.BOOLEAN,
+			allowNull: false
+			// @todo: set default to false
+		},
+		accountDisabled: {
+			type: Sequelize.BOOLEAN,
+			allowNull: false
+			// @todo: set default to false
+		},
+		loggedInAt: {
+			type: Sequelize.DATE,
+			allowNull: true
+		},
+		authOptions: {
+			type: 'association',
+			method: 'hasMany',
+			model: 'UserAuthOption',
+			as: 'authOptions',
+			foreignKey: 'userId'
+		},
+		keys: {
+			type: 'association',
+			method: 'hasMany',
+			model: 'UserKey',
+			as: 'keys',
+			foreignKey: 'userId'
+		}
+	},
+	options: {
+		paranoid: true,
+		classMethods: {
+			register: function(type, data, options, config, cb) {
+				var self = this;
+				data = data || {};
+				options = options || {};
+				options.autoLogin = options.autoLogin || config.user.register.autoLogin;
+
+				if(!this.model.get('UserAuthOption').handler.hasOwnProperty(type))
+					return cb(_.extend({params: {type: type}}, config.errors.UNKNOWN_AUTH_TYPE));
+
+				async.waterfall({
+					checkRegistered: function(cb) {
+						self.isRegistered(type, data.username, function(err, isRegistered) {
+							if(err)
+								return cb(err);
+							if(isRegistered)
+								return cb(_.extend({params: {username: data.username}}, config.errors.ALREADY_REGISTERED));
+							return cb();
+						});
+					},
+					user: function(cb) {
+						self
+						.create(data)
+						.then(function(user) {
+							cb(null, user);
+						});
+					},
+					authOption: function(user, cb) {
+						data.userId = user.id;
+						data.ip = options.ip;
+						self.model.get('UserAuthOption').handler[type].register(data, config, cb);
+					}
+				}, function(err, results) {
+					if(err) return cb(err);
+					delete results.isRegistered;
+					if(options.autoLogin && options.req) {
+						options.req.session.user = results.user.toObject();
+						options.req.user = results.user;
+						options.req.user.loadPermissions(function(err) {
+							if(err) return cb(err);
+							return cb(null, results);
+						});
+					}
+					else {
+						return cb(null, results);
+					}
+				}););
+			},
+			isRegistered: function(authType, authIdentifier, cb) {
+				this.model.get('UserAuthOption').find({
+					where: {
+						authType: authType,
+						authIdentifier: authIdentifier
+					}
+				).then(function(userAuthOption) {
+					cb(null, userAuthOption ? true : false)
+				});
+			},
+			authenticate: function(type, identifier, password, options, config, cb) {
+				if(!this.model.get('UserAuthOption').handler.hasOwnProperty(type))
+					return cb(_.extend({params: {type: type}}, config.errors.UNKNOWN_AUTH_TYPE));
+
+				return UserAuthOption.handler[type].authenticate(identifier, password, options, cb);
+			}
+		},
+
+		// instanceMethods: {
+		// 	toJSON: function() {
+		// 		 var obj = this.values;
+		// 		if(this.children) {
+		// 			obj.children = [];
+		// 			this.children.forEach(function(child) {
+		// 				obj.children.push(child.toJSON());
+		// 			});
+		// 		}
+
+		// 		if(this.permissions) {
+		// 			obj.permissions = [];
+		// 			this.permissions.forEach(function(permission) {
+		// 				obj.permissions.push(permission.toJSON());
+		// 			});
+		// 		}
+		// 		return obj;
+		// 	}
+		// }
+	}
+};
+
+module.exports = User;
+
+
+
+//////////////////
+
 // var async = require('async');
 // var User = {
 // 	authType: {

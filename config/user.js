@@ -32,5 +32,9 @@ module.exports = {
 	register: {
 		redirect: '/',
 		autoLogin: true
+	},
+	loginAttempts: {
+		max: 10,
+		timeInterval: 5
 	}
 };
