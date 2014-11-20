@@ -99,5 +99,10 @@ module.exports = {
 		code: 'INVALID_PASSWORD',
 		message: 'The password you entered is not correct.',
 		status: 400
+	},
+	PASSWORD_GENERATION: {
+		code: 'PASSWORD_GENERATION',
+		message: 'An error occured while generating the password: {{error}}',
+		status: 500
 	}
 };

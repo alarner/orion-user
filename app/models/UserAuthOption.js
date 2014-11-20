@@ -39,6 +39,16 @@ var UserAuthOption = {
 				// 	self.authPassword = generatedPassword;
 				// 	self.save(cb);
 				// });
+			},
+			handler: function(authType) {
+				if(!this.handlers.hasOwnProperty(authType))
+					throw new Error('Unknown AuthType '+authType);
+
+				var h = this.handlers[authType];
+				if(!h.hasOwnProperty('UserAuthOption'))
+					h.UserAuthOption = this;
+
+				return h;
 			}
 		},
 
@@ -66,6 +76,61 @@ var UserAuthOption = {
 
 var Handlers = {};
 Handlers[AuthType.USERNAME] = {
+
+	register: function(data, options, config, cb) {
+		var self = this;
+		if(!data.username)
+			return cb(config.errors.USERNAME_REQUIRED);
+		if(!data.password)
+			return cb(config.errors.PASSWORD_REQUIRED);
+		if(!data['confirm-password'])
+			return cb(config.errors.PASSWORD_CONFIRMATION_REQUIRED);
+		if(data.password != data['confirm-password'])
+			return cb(config.errors.PASSWORD_MISMATCH);
+
+		delete data['confirm-password'];
+
+		async.waterfall([
+			function(cb) {
+				bcrypt.genSalt(config.user.bcrypt.rounds, function(err, salt) {
+					if(err) return cb(_.extend({params: {error: err}}. config.errors.PASSWORD_GENERATION));
+					bcrypt.hash(data.password, salt, function(err, hash) {
+						if(err) return cb(_.extend({params: {error: err}}. config.errors.PASSWORD_GENERATION));
+						cb(null, hash);
+					});
+				});
+			},
+			function(generatedPassword, cb) {
+				delete data.password;
+				self.UserAuthOption.model.get('User').create(data)
+				.then(function(user) {
+					return cb(null, generatedPassword, user);
+				}, function(err) {
+					console.log(err);
+					return cb(config.errors.UNKNOWN_ERROR);
+				});
+			},
+			function(generatedPassword, user, cb) {
+				self.UserAuthOption.create({
+					userId: user.id,
+					authType: AuthType.USERNAME,
+					authIdentifier: data.username,
+					authPassword: generatedPassword,
+					ip: options.ip || null
+				})
+				.then(function(userAuthOption) {
+					return cb(null, user, userAuthOption);
+				}, function(err) {
+					console.log(err);
+					return cb(config.errors.UNKNOWN_ERROR);
+				});
+			}
+		], function(err, user, userAuthOption) {
+			if(err) return cb(err);
+			return cb(null, {user: user, userAuthOption: userAuthOption});
+		});
+	},
+
 	authenticate: function(identifier, plaintextPassword, options, config, cb) {
 		var self = this;
 		async.waterfall({
@@ -139,7 +204,7 @@ Handlers[AuthType.USERNAME] = {
 	}
 };
 
-UserAuthOption.handler = Handlers;
+UserAuthOption.options.classMethods.handlers = Handlers;
 
 module.exports = UserAuthOption;
 

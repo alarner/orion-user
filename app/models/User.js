@@ -4,24 +4,24 @@ var _ = require('lodash');
 var UserAuthOption = require('./UserAuthOption');
 var User = {
 	attributes: {
-		email: {
+		username: {
 			type: Sequelize.STRING,
 			allowNull: false
 		},
 		emailVerified: {
 			type: Sequelize.BOOLEAN,
-			allowNull: false
-			// @todo: set default to false
+			allowNull: false,
+			defaultValue: false
 		},
 		accountVerified: {
 			type: Sequelize.BOOLEAN,
-			allowNull: false
-			// @todo: set default to false
+			allowNull: false,
+			defaultValue: false
 		},
 		accountDisabled: {
 			type: Sequelize.BOOLEAN,
-			allowNull: false
-			// @todo: set default to false
+			allowNull: false,
+			defaultValue: false
 		},
 		loggedInAt: {
 			type: Sequelize.DATE,
@@ -51,11 +51,11 @@ var User = {
 				options = options || {};
 				options.autoLogin = options.autoLogin || config.user.register.autoLogin;
 
-				if(!this.model.get('UserAuthOption').handler.hasOwnProperty(type))
+				if(!this.model.get('UserAuthOption').handlers.hasOwnProperty(type))
 					return cb(_.extend({params: {type: type}}, config.errors.UNKNOWN_AUTH_TYPE));
 
-				async.waterfall({
-					checkRegistered: function(cb) {
+				async.waterfall([
+					function(cb) {
 						self.isRegistered(type, data.username, function(err, isRegistered) {
 							if(err)
 								return cb(err);
@@ -64,28 +64,19 @@ var User = {
 							return cb();
 						});
 					},
-					user: function(cb) {
-						self
-						.create(data)
-						.then(function(user) {
-							cb(null, user);
-						});
-					},
-					authOption: function(user, cb) {
-						data.userId = user.id;
-						data.ip = options.ip;
-						self.model.get('UserAuthOption').handler[type].register(data, config, cb);
+					function(cb) {
+						self.model.get('UserAuthOption').handler(type).register(data, options, config, cb);
 					}
-				}, function(err, results) {
+				], function(err, results) {
 					if(err) return cb(err);
-					delete results.isRegistered;
 					if(options.autoLogin && options.req) {
-						options.req.session.user = results.user.toObject();
+						options.req.session.user = results.user.toJSON();
 						options.req.user = results.user;
-						options.req.user.loadPermissions(function(err) {
-							if(err) return cb(err);
-							return cb(null, results);
-						});
+						cb(null, results);
+						// options.req.user.loadPermissions(function(err) {
+						// 	if(err) return cb(err);
+						// 	return cb(null, results);
+						// });
 					}
 					else {
 						return cb(null, results);
@@ -100,6 +91,8 @@ var User = {
 					}
 				}).then(function(userAuthOption) {
 					cb(null, userAuthOption ? true : false)
+				}, function(err) {
+					console.trace(err);
 				});
 			},
 			authenticate: function(type, identifier, password, options, config, cb) {

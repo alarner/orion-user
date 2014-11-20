@@ -36,5 +36,8 @@ module.exports = {
 	loginAttempts: {
 		max: 10,
 		timeInterval: 5
+	},
+	bcrypt: {
+		rounds: 10
 	}
 };
