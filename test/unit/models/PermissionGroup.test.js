@@ -7,8 +7,9 @@ var Model 	= require('../../../node_modules/orion-server/src/model');
 // refreshing properly
 
 describe('PermissionGroup', function() {
-	before(require('../../beforeModel'));
+	// before(require('../../beforeModel'));
 	beforeEach(require('../../beforeEachModel'));
+	// afterEach(require('../../afterEachModel'));
 
 	describe('when we add a permission group', function() {
 		describe('with null and valid parent permission group ids', function() {
