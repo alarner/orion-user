@@ -1,12 +1,12 @@
 module.exports = {
-	index: function(req, res, models, config) {
+	index: function(req, res, model, config) {
 		res.view({
 			error: req.error(),
 			req: req
 		});
 	},
 
-	execute: function(req, res, models, config) {
+	execute: function(req, res, model, config) {
 		var ip = req.headers['x-forwarded-for'] || 
 		req.connection.remoteAddress || 
 		req.socket.remoteAddress ||
@@ -18,11 +18,10 @@ module.exports = {
 			options.req = req;
 		}
 
-		models.User.register(
-			models.User.authType.USERNAME,
+		model.get('User').register(
+			model.get('UserAuthOption').authType.USERNAME,
 			req.body,
 			options,
-			models.UserAuthOption,
 			config,
 			function(err, result) {
 				if(err) {

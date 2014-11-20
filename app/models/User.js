@@ -3,9 +3,6 @@ var async = require('async');
 var _ = require('lodash');
 var UserAuthOption = require('./UserAuthOption');
 var User = {
-	authType: {
-		USERNAME: 1
-	},
 	attributes: {
 		email: {
 			type: Sequelize.STRING,
@@ -93,7 +90,7 @@ var User = {
 					else {
 						return cb(null, results);
 					}
-				}););
+				});
 			},
 			isRegistered: function(authType, authIdentifier, cb) {
 				this.model.get('UserAuthOption').find({
@@ -101,7 +98,7 @@ var User = {
 						authType: authType,
 						authIdentifier: authIdentifier
 					}
-				).then(function(userAuthOption) {
+				}).then(function(userAuthOption) {
 					cb(null, userAuthOption ? true : false)
 				});
 			},
