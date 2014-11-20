@@ -2,13 +2,11 @@ var Sequelize = require('sequelize');
 var async = require('async');
 var _ = require('lodash');
 var bcrypt = require('bcrypt');
+var AuthType = require('../constants/AuthType');
 
 // @todo: add error handling to all promises
 
 var UserAuthOption = {
-	authType: {
-		USERNAME: 1
-	},
 	attributes: {
 		authType: {
 			type: Sequelize.INTEGER,
@@ -67,7 +65,7 @@ var UserAuthOption = {
 };
 
 var Handlers = {};
-Handlers[UserAuthOption.authType.USERNAME] = {
+Handlers[AuthType.USERNAME] = {
 	authenticate: function(identifier, plaintextPassword, options, config, cb) {
 		var self = this;
 		async.waterfall({
@@ -75,7 +73,7 @@ Handlers[UserAuthOption.authType.USERNAME] = {
 				// @todo: use count instead of selecting all the rows
 				self.model.get('UserAuthAttempt').findAll({
 					where: {
-						authType: UserAuthOption.authType.USERNAME,
+						authType: AuthType.USERNAME,
 						authIdentifier: identifier,
 						//authError: '!= NULL', // @todo: fix this
 						//createdAt: '> DATE_SUB(NOW(), INTERVAL ? MINUTE)' // @todo: fix this
@@ -96,7 +94,7 @@ Handlers[UserAuthOption.authType.USERNAME] = {
 			authOption: function(cb) {
 				self.find({
 					where: {
-						authType: UserAuthOption.authType.USERNAME,
+						authType: AuthType.USERNAME,
 						authIdentifier: identifier
 					}
 				}).then(function(authOption) {
@@ -119,7 +117,7 @@ Handlers[UserAuthOption.authType.USERNAME] = {
 			}
 		}, function(err, results) {
 			var attempt = {
-				authType: UserAuthOption.authType.USERNAME,
+				authType: AuthType.USERNAME,
 				authIdentifier: identifier,
 				ip: options.ip || null
 			};

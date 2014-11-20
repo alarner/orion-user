@@ -1,3 +1,4 @@
+var AuthType = require('../constants/AuthType');
 module.exports = {
 	index: function(req, res, model, config) {
 		res.view({
@@ -18,8 +19,10 @@ module.exports = {
 			options.req = req;
 		}
 
+		console.log(model);
+
 		model.get('User').register(
-			model.get('UserAuthOption').authType.USERNAME,
+			AuthType.USERNAME,
 			req.body,
 			options,
 			config,
