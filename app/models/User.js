@@ -23,6 +23,11 @@ var User = {
 			allowNull: false,
 			defaultValue: false
 		},
+		timezone: {
+			type: Sequelize.STRING,
+			allowNull: false,
+			defaultValue: 'UTC'
+		},
 		loggedInAt: {
 			type: Sequelize.DATE,
 			allowNull: true

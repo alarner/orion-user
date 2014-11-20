@@ -1,7 +1,6 @@
 var AuthType = require('../constants/AuthType');
 module.exports = {
 	index: function(req, res, model, config) {
-		console.log(req.error());
 		res.view({
 			error: req.error(),
 			req: req
@@ -20,22 +19,19 @@ module.exports = {
 			options.req = req;
 		}
 
-		console.log(1);
-
 		model.get('User').register(
 			AuthType.USERNAME,
 			req.body,
 			options,
 			config,
 			function(err, result) {
-				console.log(2);
 				if(err) {
 					console.log(err);
 					res.error(err);
 					return res.redir('/register');
 				}
 
-				console.log(3);
+				console.log(result);
 				
 				return res.redirect(303, config.user.register.redirect || '/');
 			}
