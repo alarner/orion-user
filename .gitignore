@@ -3,3 +3,4 @@
 node_modules/
 public/lib/
 database.sqlite
+npm-debug.log

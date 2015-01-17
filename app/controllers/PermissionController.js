@@ -2,6 +2,12 @@ var _ = require('lodash');
 module.exports = {
 	index: function(req, res, model, config) {
 		model.get('PermissionGroup').hierarchy(function(err, groups) {
+			
+			if(err) {
+				return res.internalServerError(err.message);
+			}
+
+
 			var getAvailablePermissions = function(config, pluginPath) {
 				var availablePermissions = [];
 				availablePermissions.push({

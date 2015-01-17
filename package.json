@@ -8,7 +8,6 @@
     "bcrypt": "^0.8.0",
     "lodash": "^2.4.1",
     "orion-server": "git://github.com/alarner/orion-server",
-    "sails-disk": "^0.10.4",
     "sequelize": "^2.0.0-rc1"
   },
   "devDependencies": {

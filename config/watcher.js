@@ -12,5 +12,5 @@ module.exports = {
 	// Interval of file system polling for binary files.
 	binaryInterval: 300,
 	// Whether to use fs.watchFile (backed by polling), or fs.watch. If polling leads to high CPU utilization, consider setting this to false.
-	usePolling: false
+	usePolling: true
 };
