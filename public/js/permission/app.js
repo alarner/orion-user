@@ -5,7 +5,7 @@ angular.module('permission', ['ui.router', 'permission.controllers', 'permission
 
 	.state('home', {
 		url: '/home',
-		templateUrl: 'templates/permission/home.html',
+		templateUrl: '/templates/permission/home.html',
 		controller: 'HomeCtrl'
 	})
 

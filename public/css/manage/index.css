@@ -1,0 +1,20 @@
+a {
+  cursor: pointer; }
+
+.value-buttons {
+  min-width: 171px; }
+
+.btn.active.grant {
+  color: #FFF;
+  background-color: #5CB85C;
+  border-color: #4CAE4C; }
+.btn.active.deny {
+  color: #FFF;
+  background-color: #D9534F;
+  border-color: #D43F3A; }
+
+#tree li span:nth-of-type(2) {
+  display: inline-block;
+  min-width: 14px; }
+#tree li.list-group-item:first-child span:nth-child(2) {
+  display: inline; }

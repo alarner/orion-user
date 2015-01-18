@@ -1,0 +1,28 @@
+{{#extend "bootstrap"}}
+	{{#append "head"}}
+		<link rel="stylesheet" href="/css/manage/index.css" />
+	{{/append}}
+	{{#replace "body"}}
+		<div class="container" ng-app="manage">
+			<div class="row">
+				<div class="col-sm-12" ui-view>
+				</div>
+			</div>
+		</div>
+	{{/replace}}
+	{{#append "scripts"}}
+		<script src="/lib/angularjs/angular.min.js"></script>
+		<script src="/lib/angular-ui-router/release/angular-ui-router.min.js"></script>
+		<script src="/lib/angular-resource/angular-resource.min.js"></script>
+		<script src="/js/manage/app.js"></script>
+		<script src="/js/manage/controllers.js"></script>
+		<script src="/js/manage/services.js"></script>
+		<script>
+			angular.module('manage.data', [])
+				.value('query', {{ query }});
+				// .value('PermissionGroups', {{{json groups}}})
+				// .value('AvailablePermissions', {{{json availablePermissions}}})
+				// .value('Host', '{{ host }}');
+		</script>
+	{{/append}}
+{{/extend}}
