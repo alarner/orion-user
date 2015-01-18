@@ -4,7 +4,7 @@
 // Key of '*!' will apply the policy to all of the controllers (or actions if
 // it's a child of a controller) even if they have their own policies.
 module.exports = {
-	// '*!': ['orion-api::response']
+	'*!': ['orion-api::response']
 	/*
 	'*!': ['greeting'],
 	'*': ['auth'],

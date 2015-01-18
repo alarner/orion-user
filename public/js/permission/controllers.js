@@ -25,7 +25,6 @@ angular.module('permission.controllers', ['permission.data', 'permission.service
 	});
 
 	$('#tree').on('nodeSelected', function(e, node) {
-		// $rootScope.$emit('GROUP_SELECTED', node.permissionGroup);
 		$state.go('permission-group', {id: node.href});
 	});
 })
@@ -99,10 +98,34 @@ angular.module('permission.controllers', ['permission.data', 'permission.service
 	    });
 	};
 
+	$scope.setGroup = function(groupId) {
+		var nodes = $('#tree').data().plugin_treeview.nodes;
+
+		var findNode = function(nodes) {
+			for(var i in nodes) {
+				if(nodes[i].href === groupId) return nodes[i];
+			}
+
+			for(var i in nodes) {
+				if(nodes[i].permissionGroup.children.length) {
+					var foundNode = findNode(nodes[i].permissionGroup.children);
+					if(foundNode) return foundNode;
+				}
+			}
+
+			return false;
+
+		}
+
+		var foundNode = findNode(nodes);
+		if(!foundNode) throw 'Unable to find node with group id = '+groupId;
+
+		$('.node-tree[data-nodeid="'+foundNode.nodeId+'"').click();
+
+	};
+
 	PermissionGroupAPI.get({ id: $stateParams.id }).$promise.then(function(pg) {
 		$scope.loading = false;
 		$scope.groupPermissions = pg.data;
     });
-
-
 });

@@ -8,6 +8,7 @@
     "bcrypt": "^0.8.0",
     "lodash": "^2.4.1",
     "orion-server": "git://github.com/alarner/orion-server",
+    "orion-api": "git://github.com/alarner/orion-api",
     "sequelize": "^2.0.0-rc1"
   },
   "devDependencies": {
