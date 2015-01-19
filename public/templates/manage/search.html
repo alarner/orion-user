@@ -9,21 +9,23 @@
 <div ng-show="loading">
 	loading...
 </div>
-<div class="results" ng-show="searchResults && !loading">
+<div class="results" ng-show="searchResults && searchResults.length == 0 && !loading">
+	no users found
+</div>
+<div class="results" ng-show="searchResults && searchResults.length > 0 && !loading">
 	<nav>
 		<ul class="pagination">
-			<li>
-				<a href="#" aria-label="Previous">
+			<li class="{{ pageInfo.current == 1 ? 'disabled' : '' }}">
+				<a href="#/search/{{ query }}/{{ pageInfo.current - 1 }}" aria-label="Previous">
 					<span aria-hidden="true">&laquo;</span>
 				</a>
 			</li>
-			<li><a href="#">1</a></li>
-			<li><a href="#">2</a></li>
-			<li><a href="#">3</a></li>
-			<li><a href="#">4</a></li>
-			<li><a href="#">5</a></li>
-			<li>
-				<a href="#" aria-label="Next">
+
+			<li ng-repeat="page in pages" class="{{ page.number == pageInfo.current ? 'active' : '' }}">
+				<a ng-href="#/search/{{ query }}/{{ page.number }}">{{ page.number }}</a>
+			</li>
+			<li class="{{ pageInfo.current == pageInfo.max ? 'disabled' : '' }}">
+				<a href="#/search/{{ query }}/{{ pageInfo.current + 1 }}" aria-label="Next">
 					<span aria-hidden="true">&raquo;</span>
 				</a>
 			</li>
@@ -39,7 +41,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr ng-repeat="user in searchResults">
+			<tr ng-repeat="user in searchResults" ng-click="editUser(user.id)">
 				<td>{{ user.id }}</td>
 				<td>{{ user.username }}</td>
 				<td>{{ user.timezone }}</td>
@@ -49,18 +51,17 @@
 	</table
 	<nav>
 		<ul class="pagination">
-			<li>
-				<a href="#" aria-label="Previous">
+			<li class="{{ pageInfo.current == 1 ? 'disabled' : '' }}">
+				<a href="#/search/{{ query }}/{{ pageInfo.current - 1 }}" aria-label="Previous">
 					<span aria-hidden="true">&laquo;</span>
 				</a>
 			</li>
-			<li><a href="#">1</a></li>
-			<li><a href="#">2</a></li>
-			<li><a href="#">3</a></li>
-			<li><a href="#">4</a></li>
-			<li><a href="#">5</a></li>
-			<li>
-				<a href="#" aria-label="Next">
+
+			<li ng-repeat="page in pages" class="{{ page.number == pageInfo.current ? 'active' : '' }}">
+				<a ng-href="#/search/{{ query }}/{{ page.number }}">{{ page.number }}</a>
+			</li>
+			<li class="{{ pageInfo.current == pageInfo.max ? 'disabled' : '' }}">
+				<a href="#/search/{{ query }}/{{ pageInfo.current + 1 }}" aria-label="Next">
 					<span aria-hidden="true">&raquo;</span>
 				</a>
 			</li>

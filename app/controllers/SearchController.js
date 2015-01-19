@@ -6,13 +6,28 @@ module.exports = {
 
 			return res.api.setError('Missing query parameter.', 400).send();
 		}
-		model.get('User').findAll({
-			where: ['username like ?', '%' + req.parsedUrl.query.query + '%']
+
+		var limit = parseInt(req.parsedUrl.query.limit) || 20;
+		var page = parseInt(req.parsedUrl.query.page) || 1;
+
+		limit = Math.min(limit, 250); // Don't let us query more than 250 at a time
+		page = Math.max(page, 1); // Don't let the page be less than 1
+
+		model.get('User').findAndCountAll({
+			where: ['username like ?', '%' + req.parsedUrl.query.query + '%'],
+			limit: limit,
+			offset: (page-1)*limit
 		}, {raw: true}).then(function(users) {
-			return res.api.setData(users).send();
+			res.api.setMetadata({
+				count: users.count,
+				page: {
+					max: Math.ceil(users.count/limit),
+					current: page
+				}
+			});
+			return res.api.setData(users.rows).send();
 		}, function(err) {
 			return res.api.setError(err, 500).send();
 		});
-		
 	}
 };

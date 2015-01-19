@@ -4,16 +4,16 @@ angular.module('manage', ['ui.router', 'manage.controllers', 'manage.services'])
 	$stateProvider
 
 	.state('search', {
-		url: '/search',
+		url: '/search/:query/:page',
 		templateUrl: '/templates/manage/search.html',
 		controller: 'SearchCtrl'
-	});
+	})
 
-	// .state('permission-group', {
-	// 	url: '/permission-group/:id',
-	// 	templateUrl: 'templates/permission/permission-group.html',
-	// 	controller: 'PermissionGroupCtrl'
-	// });
+	.state('edit', {
+		url: '/edit/:id',
+		templateUrl: 'templates/manage/edit.html',
+		controller: 'EditCtrl'
+	});
 
 })
 

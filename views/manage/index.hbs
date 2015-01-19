@@ -19,10 +19,8 @@
 		<script src="/js/manage/services.js"></script>
 		<script>
 			angular.module('manage.data', [])
-				.value('query', {{ query }});
-				// .value('PermissionGroups', {{{json groups}}})
-				// .value('AvailablePermissions', {{{json availablePermissions}}})
-				// .value('Host', '{{ host }}');
+				.value('query', '{{ query }}')
+				.value('Host', '{{ host }}');
 		</script>
 	{{/content}}
 {{/extend}}
