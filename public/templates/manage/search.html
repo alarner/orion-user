@@ -1,3 +1,69 @@
-<div>
-	search
+<form ng-submit="search(query)">
+	<div class="input-group">
+		<input type="text" class="form-control" placeholder="Search by username or user id..." ng-model="query">
+		<span class="input-group-btn">
+			<button class="btn btn-default" type="submit">Search</button>
+		</span>
+	</div>
+</form>
+<div ng-show="loading">
+	loading...
+</div>
+<div class="results" ng-show="searchResults && !loading">
+	<nav>
+		<ul class="pagination">
+			<li>
+				<a href="#" aria-label="Previous">
+					<span aria-hidden="true">&laquo;</span>
+				</a>
+			</li>
+			<li><a href="#">1</a></li>
+			<li><a href="#">2</a></li>
+			<li><a href="#">3</a></li>
+			<li><a href="#">4</a></li>
+			<li><a href="#">5</a></li>
+			<li>
+				<a href="#" aria-label="Next">
+					<span aria-hidden="true">&raquo;</span>
+				</a>
+			</li>
+		</ul>
+	</nav>
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>Username</th>
+				<th>Timezone</th>
+				<th>Last Login</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="user in searchResults">
+				<td>{{ user.id }}</td>
+				<td>{{ user.username }}</td>
+				<td>{{ user.timezone }}</td>
+				<td>{{ user.loggedInAt }}</td>
+			</tr>
+		</tbody>
+	</table
+	<nav>
+		<ul class="pagination">
+			<li>
+				<a href="#" aria-label="Previous">
+					<span aria-hidden="true">&laquo;</span>
+				</a>
+			</li>
+			<li><a href="#">1</a></li>
+			<li><a href="#">2</a></li>
+			<li><a href="#">3</a></li>
+			<li><a href="#">4</a></li>
+			<li><a href="#">5</a></li>
+			<li>
+				<a href="#" aria-label="Next">
+					<span aria-hidden="true">&raquo;</span>
+				</a>
+			</li>
+		</ul>
+	</nav>
 </div>

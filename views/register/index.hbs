@@ -1,8 +1,8 @@
 {{#extend "bootstrap"}}
-	{{#append "head"}}
+	{{#content "head" mode="append"}}
 		<link rel="stylesheet" href="/css/index/login.css" />
-	{{/append}}
-	{{#replace "body"}}
+	{{/content}}
+	{{#content "body" mode="replace"}}
 		<div class="container">
 			<form class="form-signin" role="form" action="/register/execute" method="post">
 				<h2 class="form-signin-heading">Please register</h2>
@@ -15,5 +15,5 @@
 				<button class="btn btn-lg btn-primary btn-block btn-register" type="submit">Register</button>
 			</form>
 		</div>
-	{{/replace}}
+	{{/content}}
 {{/extend}}

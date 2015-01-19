@@ -1,8 +1,8 @@
-{{#extend "bootstrap"}}
-	{{#append "head"}}
+{{#extend "bootstrap-nav"}}
+	{{#content "head" mode="append"}}
 		<link rel="stylesheet" href="/css/permission/index.css" />
-	{{/append}}
-	{{#replace "body"}}
+	{{/content}}
+	{{#content "body" mode="replace"}}
 		<div class="container" ng-app="permission">
 			<div class="row">
 				<div class="col-sm-3" ng-controller="TreeCtrl">
@@ -12,8 +12,8 @@
 				</div>
 			</div>
 		</div>
-	{{/replace}}
-	{{#append "scripts"}}
+	{{/content}}
+	{{#content "scripts" mode="append"}}
 		<script src="/lib/bootstrap-treeview/dist/bootstrap-treeview.min.js"></script>
 		<script src="/lib/angularjs/angular.min.js"></script>
 		<script src="/lib/angular-ui-router/release/angular-ui-router.min.js"></script>
@@ -27,5 +27,5 @@
 				.value('AvailablePermissions', {{{json availablePermissions}}})
 				.value('Host', '{{ host }}');
 		</script>
-	{{/append}}
+	{{/content}}
 {{/extend}}

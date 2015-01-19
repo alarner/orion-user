@@ -1,6 +1,6 @@
 module.exports = {
 	// (regexp or function) files to be ignored. Tested against the whole path
-	ignored: /\.tmp\//,
+	ignored: /(\.tmp\/|\/database\.sqlite)/,
 	// Indicates whether the process should continue to run as long as files are being watched.
 	persistent: false,
 	// Indicates whether to watch files that don't have read permissions.

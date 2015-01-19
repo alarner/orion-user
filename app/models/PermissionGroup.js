@@ -149,10 +149,22 @@ var PermissionGroup = {
 					{},
 					[parentId]
 				).then(function(results) {
-					if(results.length == 0) return false;
+					if(results.length == 0) {
+						self.model.get('PermissionGroup').create({
+							name: 'root',
+							lft: 1,
+							rgt: 2
+						}).then(function(result) {
+							cb(null, result);
+						}, function(err) {
+							cb(err);
+						});
+						return;
+						// return cb({message: 'No root node found'});
+					}
 					if(results.length == 1) {
 						results[0].children = [];
-						return results[0];
+						return cb(null, results[0]);
 					}
 					var root = results[0];
 					root.children = [];
